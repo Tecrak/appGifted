@@ -166,18 +166,19 @@
         const sculptureList = document.getElementById('sculptureList');
         const map = document.getElementById('zoom');
         let isDragging = false;
-        let startY, initialTop, initialHeight;
+        let startEvent, initialTop, initialHeight, mapHeight;
 
-        gripper.addEventListener('mousedown', function(event) {
+        const startDrag = function(event) {
             isDragging = true;
-            startY = event.clientY;
+            startEvent = event.touches ? event.touches[0] : event;
             initialTop = parseInt(getComputedStyle(sculptureList).top) || 0;
             initialHeight = parseInt(getComputedStyle(sculptureList).height) || 260;
             mapHeight = parseInt(getComputedStyle(map).height) || 260;
 
-            function handleMouseMove(event) {
+            const handleDrag = function(event) {
                 if (isDragging) {
-                    const deltaY = event.clientY - startY;
+                    const currentEvent = event.touches ? event.touches[0] : event;
+                    const deltaY = currentEvent.clientY - startEvent.clientY;
                     let newTop = initialTop + deltaY;
                     let newHeight = initialHeight - deltaY;
                     let newMap = mapHeight;
@@ -190,21 +191,25 @@
                     if (newHeight < 230) {
                         newMap = 360;
                     }
+
                     if (parseInt(getComputedStyle(sculptureList).height) > 385) {
                         sculptureList.style.background = "url(purpleBack.png) center center/cover";
                     } else {
                         sculptureList.style.background = "white";
                     }
+
                     sculptureList.style.top = `${newTop}px`;
                     sculptureList.style.height = `${newHeight}px`;
                 }
-            }
+            };
 
-            function handleMouseUp() {
+            const stopDrag = function() {
                 if (isDragging) {
                     isDragging = false;
-                    document.removeEventListener('mousemove', handleMouseMove);
-                    document.removeEventListener('mouseup', handleMouseUp);
+                    document.removeEventListener('mousemove', handleDrag);
+                    document.removeEventListener('touchmove', handleDrag);
+                    document.removeEventListener('mouseup', stopDrag);
+                    document.removeEventListener('touchend', stopDrag);
 
                     // Check if newHeight is greater than 385 and change the background
                     if (parseInt(getComputedStyle(sculptureList).height) > 370) {
@@ -214,23 +219,30 @@
                     } else {
                         sculptureList.style.background = "white";
                     }
+
                     if(parseInt(getComputedStyle(sculptureList).height) < 369 && parseInt(getComputedStyle(sculptureList).height) > 200 || parseInt(getComputedStyle(sculptureList).top) > 109) {
                         sculptureList.style.height="268px";
                         sculptureList.style.top="0px";
                     }
+
                     if(parseInt(getComputedStyle(sculptureList).top) > 68) {
                         sculptureList.style.height="160px";
                         sculptureList.style.top="250px";
                     }
                 }
-            }
+            };
 
-            document.addEventListener('mousemove', handleMouseMove);
-            document.addEventListener('mouseup', handleMouseUp);
+            document.addEventListener('mousemove', handleDrag);
+            document.addEventListener('touchmove', handleDrag, { passive: false });
+            document.addEventListener('mouseup', stopDrag);
+            document.addEventListener('touchend', stopDrag);
 
             // Prevent default dragging behavior
             event.preventDefault();
-        });
+        };
+
+        gripper.addEventListener('mousedown', startDrag);
+        gripper.addEventListener('touchstart', startDrag);
     });
 </script>
     <script> // Zooming map
