@@ -11,7 +11,7 @@
     <div class="phoneContainer">
         <div class="phoneTopBlack"></div>
         <div class="phoneContent">
-            <div class="navigationBlock">
+            <div class="navigationBlock" id="navigationBlock">
                 <div class="navigationIcon" onclick="openMenu()"><i class="fa-solid fa-bars" id="navigationIcon"></i>
                     <ul class="navigationMenu" id="navigationMenu">
                         <div class="closeMenu" id="chrestMenu" onclick="closeMenu()"><i class="fa-solid fa-xmark" style="cursor: pointer;"></i></div>
@@ -162,12 +162,18 @@
     </script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Elements
             const gripper = document.getElementById('gripper');
             const sculptureList = document.getElementById('sculptureList');
+            const navigationBlock = document.getElementById("navigationBlock");
             const map = document.getElementById('zoom');
+
+            // Dragging variables
             let isDragging = false;
             let startEvent, initialTop, initialHeight, mapHeight;
 
+
+            // Start drag function
             const startDrag = function(event) {
                 isDragging = true;
                 startEvent = event.touches ? event.touches[0] : event;
@@ -175,6 +181,7 @@
                 initialHeight = parseInt(getComputedStyle(sculptureList).height) || 260;
                 mapHeight = parseInt(getComputedStyle(map).height) || 260;
 
+                // Handle drag function
                 const handleDrag = function(event) {
                     if (isDragging) {
                         const currentEvent = event.touches ? event.touches[0] : event;
@@ -182,6 +189,8 @@
                         let newTop = initialTop + deltaY;
                         let newHeight = initialHeight - deltaY;
                         let newMap = mapHeight;
+                        sculptureList.style.transition = "height 0.01s ease-in-out, top 0.01s ease-in-out, background 0.5s ease";
+                        navigationBlock.style.background = "#00068C";
 
                         // Set minimum and maximum values
                         newTop = Math.min(250, Math.max(newTop, -262));
@@ -203,7 +212,8 @@
                     }
                 };
 
-                const stopDrag = function() {
+                // Stop drag function
+                const stopDrag = function () {
                     if (isDragging) {
                         isDragging = false;
                         document.removeEventListener('mousemove', handleDrag);
@@ -211,27 +221,36 @@
                         document.removeEventListener('mouseup', stopDrag);
                         document.removeEventListener('touchend', stopDrag);
 
-                        // Check if newHeight is greater than 385 and change the background
-                        if (parseInt(getComputedStyle(sculptureList).height) > 370 && parseInt(getComputedStyle(sculptureList).top) < -101) {
-                            sculptureList.style.background = "url(purpleBack.png) center center/cover";
-                            sculptureList.style.height="530px";
-                            sculptureList.style.top="-262px";
-                        } else {
-                            sculptureList.style.background = "white";
-                        }
+                        sculptureList.style.transition="height 0.5s ease-in-out, top 0.5s ease-in-out, background 0.5s ease";
 
-                        if(parseInt(getComputedStyle(sculptureList).height) < 369 && parseInt(getComputedStyle(sculptureList).height) > 200 || parseInt(getComputedStyle(sculptureList).top) > 109) {
-                            sculptureList.style.height="268px";
-                            sculptureList.style.top="0px";
-                        }
+                            if((parseInt(getComputedStyle(sculptureList).height) === 530 && parseInt(getComputedStyle(sculptureList).top) === -262)){
+                                navigationBlock.style.background = "#C800EF";
+                            }
+                            // Background adjustments
+                            if (parseInt(getComputedStyle(sculptureList).height) > 370 && parseInt(getComputedStyle(sculptureList).top) < -101) {
+                                sculptureList.style.background = "url(purpleBack.png) center center/cover";
+                                sculptureList.style.height = "530px";
+                                navigationBlock.style.background = "#C800EF";
+                                sculptureList.style.top = "-262px";
+                            } else {
+                                sculptureList.style.background = "white";
+                            }
 
-                        if(parseInt(getComputedStyle(sculptureList).top) > 68) {
-                            sculptureList.style.height="160px";
-                            sculptureList.style.top="250px";
+                            // Additional height and top adjustments based on conditions
+                            if (parseInt(getComputedStyle(sculptureList).height) < 369 && parseInt(getComputedStyle(sculptureList).height) > 200 || parseInt(getComputedStyle(sculptureList).top) > 109) {
+                                sculptureList.style.height = "268px";
+                                sculptureList.style.top = "0px";
+                                navigationBlock.style.background = "#00068";
+                            }
+
+                            if (parseInt(getComputedStyle(sculptureList).top) > 68) {
+                                sculptureList.style.height = "160px";
+                                sculptureList.style.top = "250px";
+                                navigationBlock.style.background = "#00068";   
                         }
                     }
                 };
-
+                // Event listeners for dragging
                 document.addEventListener('mousemove', handleDrag);
                 document.addEventListener('touchmove', handleDrag, { passive: false });
                 document.addEventListener('mouseup', stopDrag);
@@ -241,11 +260,11 @@
                 event.preventDefault();
             };
 
+            // Event listeners for starting drag
             gripper.addEventListener('mousedown', startDrag);
             gripper.addEventListener('touchstart', startDrag);
         });
     </script>
-</script>
     <script> // Zooming map
         const zoomTarget = document.getElementById("zoom")
         const pointChat = document.getElementById("pointChat");
