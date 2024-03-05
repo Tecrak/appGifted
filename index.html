@@ -212,7 +212,7 @@
                     document.removeEventListener('touchend', stopDrag);
 
                     // Check if newHeight is greater than 385 and change the background
-                    if (parseInt(getComputedStyle(sculptureList).height) > 370) {
+                    if (parseInt(getComputedStyle(sculptureList).height) > 370 && parseInt(getComputedStyle(sculptureList).top) > -101 ) {
                         sculptureList.style.background = "url(purpleBack.png) center center/cover";
                         sculptureList.style.height="530px";
                         sculptureList.style.top="-262px";
